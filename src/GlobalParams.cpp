@@ -60,3 +60,4 @@ PowerConfig GlobalParams::power_configuration;
 // out of yaml configuration
 bool GlobalParams::ascii_monitor;
 int GlobalParams::channel_selection;
+bool GlobalParams::use_neuron_core;

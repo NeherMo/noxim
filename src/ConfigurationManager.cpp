@@ -92,6 +92,7 @@ void loadConfiguration() {
     GlobalParams::use_winoc = readParam<bool>(config, "use_winoc");
     GlobalParams::winoc_dst_hops = readParam<int>(config, "winoc_dst_hops",0);
     GlobalParams::use_powermanager = readParam<bool>(config, "use_wirxsleep");
+    GlobalParams::use_neuron_core = readParam<bool>(config, "use_neuron_core",false);
     
 
     set<int> channelSet;
@@ -338,9 +339,9 @@ void checkConfiguration()
 	exit(1);
     }
 
-    if (GlobalParams::min_packet_size < 2 ||
-	GlobalParams::max_packet_size < 2) {
-	cerr << "Error: packet size must be >= 2" << endl;
+    if (GlobalParams::min_packet_size < 1 ||
+	GlobalParams::max_packet_size < 1) {
+	cerr << "Error: packet size must be >= 1" << endl;
 	exit(1);
     }
 

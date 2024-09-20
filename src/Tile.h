@@ -14,6 +14,10 @@
 #include <systemc.h>
 #include "Router.h"
 #include "ProcessingElement.h"
+#include "NeuronCore.h"
+
+#include "GlobalParams.h"
+
 using namespace std;
 
 SC_MODULE(Tile)
@@ -72,8 +76,8 @@ SC_MODULE(Tile)
 
 
     // Instances
-    Router *r;		                // Router instance
-    ProcessingElement *pe;	                // Processing Element instance
+    Router *r;                  // Router instance
+    ProcessingElement *pe;      // Neuron Core instance
 
     // Constructor
 
@@ -126,28 +130,51 @@ SC_MODULE(Tile)
 	r->ack_tx[DIRECTION_HUB] (hub_ack_tx);
 	r->buffer_full_status_tx[DIRECTION_HUB] (hub_buffer_full_status_tx);
 
+    if (GlobalParams::use_neuron_core) {
+        // Processing Element pin assignments
+        pe = new NeuronCore("ProcessingElement");
+        pe->clock(clock);
+        pe->reset(reset);
 
-	// Processing Element pin assignments
-	pe = new ProcessingElement("ProcessingElement");
-	pe->clock(clock);
-	pe->reset(reset);
+        pe->flit_rx(flit_rx_local);
+        pe->req_rx(req_rx_local);
+        pe->ack_rx(ack_rx_local);
+        pe->buffer_full_status_rx(buffer_full_status_rx_local);
+        
 
-	pe->flit_rx(flit_rx_local);
-	pe->req_rx(req_rx_local);
-	pe->ack_rx(ack_rx_local);
-	pe->buffer_full_status_rx(buffer_full_status_rx_local);
-	
+        pe->flit_tx(flit_tx_local);
+        pe->req_tx(req_tx_local);
+        pe->ack_tx(ack_tx_local);
+        pe->buffer_full_status_tx(buffer_full_status_tx_local);
 
-	pe->flit_tx(flit_tx_local);
-	pe->req_tx(req_tx_local);
-	pe->ack_tx(ack_tx_local);
-	pe->buffer_full_status_tx(buffer_full_status_tx_local);
+        // NoP
+        //
+        r->free_slots[DIRECTION_LOCAL] (free_slots_local);
+        r->free_slots_neighbor[DIRECTION_LOCAL] (free_slots_neighbor_local);
+        pe->free_slots_neighbor(free_slots_neighbor_local);
+    } else {
+        // Processing Element pin assignments
+        pe = new ProcessingElement("ProcessingElement");
+        pe->clock(clock);
+        pe->reset(reset);
 
-	// NoP
-	//
-	r->free_slots[DIRECTION_LOCAL] (free_slots_local);
-	r->free_slots_neighbor[DIRECTION_LOCAL] (free_slots_neighbor_local);
-	pe->free_slots_neighbor(free_slots_neighbor_local);
+        pe->flit_rx(flit_rx_local);
+        pe->req_rx(req_rx_local);
+        pe->ack_rx(ack_rx_local);
+        pe->buffer_full_status_rx(buffer_full_status_rx_local);
+        
+
+        pe->flit_tx(flit_tx_local);
+        pe->req_tx(req_tx_local);
+        pe->ack_tx(ack_tx_local);
+        pe->buffer_full_status_tx(buffer_full_status_tx_local);
+
+        // NoP
+        //
+        r->free_slots[DIRECTION_LOCAL] (free_slots_local);
+        r->free_slots_neighbor[DIRECTION_LOCAL] (free_slots_neighbor_local);
+        pe->free_slots_neighbor(free_slots_neighbor_local);
+    }
 
     }
 

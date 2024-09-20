@@ -185,6 +185,7 @@ struct GlobalParams {
     // out of yaml configuration
     static bool ascii_monitor;
     static int channel_selection;
+    static bool use_neuron_core;
 };
 
 #endif
